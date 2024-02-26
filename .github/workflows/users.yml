@@ -10,7 +10,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
+    - name: Permission
+      run: sudo chmod 666 /var/run/docker.sock
     - name: Build and push users Docker image
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
