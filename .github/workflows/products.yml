@@ -1,0 +1,31 @@
+name: Products CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Build and push products Docker image
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        cd products
+        docker build -t sivakumar2905/products:latest .
+        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        docker push sivakumar2905/products:latest
+
+    - name: Pull Docker image
+      run: sudo docker pull sivakumar2905/products:latest
+
+    - name: Delete Old docker container
+      run: sudo docker rm -f products-container || true
+
+    - name: Run Docker Container
+      run: sudo docker run -d -p 4001:4001 --name products-container sivakumar2905/products:latest
